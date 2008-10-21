@@ -135,12 +135,16 @@ class PsIntegracao
   def self.to_peso valor
     return nil if valor.nil?
     return nil if valor.class != String
+    return "000" if valor.to_f == 0
 
-    frac = valor.to_d.frac.to_s + "00"
-    frac = frac[2,3]
+	  # obtem a parte fracionaria e transforma em string.
+		frac = valor.to_f - valor.to_i
+		frac = frac.to_s + "00" 				
+		frac = frac[2..4]
     inteiro = ""
-    inteiro = valor.to_i.to_s if (valor.to_i > 0)
-    novo_valor = inteiro + frac.to_s
+	  inteiro = valor.to_i.to_s if (valor.to_f.truncate > 0)
+	  novo_valor = inteiro + frac.to_s
+
   end
 
 
@@ -155,12 +159,16 @@ class PsIntegracao
   def self.to_dinheiro valor
     return nil if valor.nil?
     return nil if valor.class != String
+    return "00" if valor.to_f == 0
 
-    frac = valor.to_d.frac.to_s + "0"
-    frac = frac[2,2]
-    inteiro = ""
-    inteiro = valor.to_i.to_s if (valor.to_i > 0)
-    novo_valor = inteiro + frac.to_s
+		  # obtem a parte fracionaria e transforma em string.
+			frac = valor.to_f - valor.to_i
+			frac = frac.to_s + "0" 				
+			frac = frac[2..3]
+			# Se tiver parte inteira, concatena com a parte fracionaria
+	    inteiro = ""
+  	  inteiro = valor.to_i.to_s if valor.to_f.truncate > 0
+  	  inteiro + frac
     
   end
 
