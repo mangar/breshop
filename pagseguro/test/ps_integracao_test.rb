@@ -1,10 +1,10 @@
-require File.dirname(__FILE__) + '/test_helper'
+require File.dirname(__FILE__) + '/../lib/ps_integracao'
 
-# require 'rubygems'
-# require File.dirname(__FILE__) + '/../init'
+require 'test/unit'
 
 
-class PsIntegracaoTest < ActiveSupport::TestCase  
+
+class PsIntegracaoTest < Test::Unit::TestCase  
   
   def test_checkout_htmlform
     assert_nil nil
@@ -69,7 +69,7 @@ class PsIntegracaoTest < ActiveSupport::TestCase
     
     #1.2 - valor nao conversivel a decimal
     valor = PsIntegracao.to_dinheiro "abc"
-    assert_equal "00", valor, "1.2 - o valor deve ser conversivel a decimal, caso contrario retornara o peso zerado no formado PS (000)"
+    assert_equal "00", valor, "1.2 - o valor deve ser conversivel a decimal, caso contrario retornara o peso zerado no formato PS (000)"
 
     #1.3 - valor deve ser uma String
     valor = PsIntegracao.to_dinheiro 14
