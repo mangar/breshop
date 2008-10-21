@@ -6,10 +6,10 @@ require File.dirname(__FILE__) + '/../lib/item'
 class SalesTest < Test::Unit::TestCase
   def setup
     @items = Items.new
-    @item_1 = Item.new({:id=>1, 
-                        :descr=>"Primeiro Item", 
-                        :valor=>10.0, 
-                        :quant=>2, 
+    @item_1 = Item.new({:id=>1,
+                        :descr=>"Primeiro Item",
+                        :valor=>10.0,
+                        :quant=>2,
                         :peso=>10})
     @items << @item_1
     @config = YAML.load_file(File.dirname(__FILE__) + "/../config/test.yml")
