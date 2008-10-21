@@ -43,7 +43,7 @@ class PagseguroTest < Test::Unit::TestCase
     assert_equal(2000, @pagseguro.weight)
   end
   
-  def test_shipping
+  def test_shippings
     @pagseguro << @item_1
     
     assert_equal("8,80", @pagseguro.shipping("05116050", "EN"))
