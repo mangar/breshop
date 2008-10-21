@@ -1,7 +1,7 @@
 require 'yaml'
-require 'items'
-require 'exceptions'
-require 'sales'
+require File.dirname(__FILE__) + '/item'
+require File.dirname(__FILE__) + '/util'
+require File.dirname(__FILE__) + '/sale'
 
 class Pagseguro
   

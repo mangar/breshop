@@ -1,6 +1,5 @@
 require 'test/unit'
 require File.dirname(__FILE__) + '/../lib/item'
-require File.dirname(__FILE__) + '/../lib/items'
 
 class ItemsTest < Test::Unit::TestCase
   

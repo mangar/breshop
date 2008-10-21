@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/../lib/ps_integracao'
 
 require 'test/unit'
-# require File.dirname(__FILE__) + '/../init'
+
 
 
 class PsIntegracaoTest < Test::Unit::TestCase  

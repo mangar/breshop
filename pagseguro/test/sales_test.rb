@@ -1,8 +1,7 @@
 require 'test/unit'
 require 'yaml'
-require File.dirname(__FILE__) + '/../lib/sales'
+require File.dirname(__FILE__) + '/../lib/sale'
 require File.dirname(__FILE__) + '/../lib/item'
-require File.dirname(__FILE__) + '/../lib/items'
 
 class SalesTest < Test::Unit::TestCase
   def setup
