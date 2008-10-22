@@ -1,10 +1,9 @@
 require 'yaml'
 require File.dirname(__FILE__) + '/items'
 require File.dirname(__FILE__) + '/util'
-require File.dirname(__FILE__) + '/sale'
+require File.dirname(__FILE__) + '/sales'
 
-class Pagseguro
-  
+class Pagseguro 
   attr_accessor :items, :config
   
   def initialize
@@ -25,7 +24,7 @@ class Pagseguro
   end
   
   def sales(destiny, shipping="EN")
-    @sales = Sales.new(:items=>@items, :config=>@config, :destiny=>destiny, :shipping=>shipping) 
+    @sales = Sales.new(:items=>@items, :config=>@config, :destiny=>destiny, :shipping=>shipping)
   end
   
   def shipping(destiny, shipping="EN")
