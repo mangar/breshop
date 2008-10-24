@@ -1,0 +1,1 @@
+class InvalidItem < Exception; end

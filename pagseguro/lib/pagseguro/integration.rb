@@ -5,7 +5,7 @@ require 'net/https'
 require 'hpricot'
 require 'bigdecimal'
 
-class PsIntegracao
+class Integration
     
   #TODO test
   def initialize(pars = {})
@@ -18,56 +18,30 @@ class PsIntegracao
     
     @uri = URI.parse(@config['webpagto'])
   end
-  
-  # # Email do vendedor do PagSeguro.
-  # # Para que a loja comece a receber os pagamento pelo PagSeguro é necessário que o lojista tenha 
-  # # o cadastro no PagSeguro e que este esteja habilitado a receber / efetuar vendas pelo site.
-  # #
-  # # Este valor pode ser definido no environment.rb
-  # EMAIL_COBRANCA = "email_cadastrado_no_pagseguro@uol.com.br"
-  # 
-  # # Tipo padrao do carrinho de compras, este campo pode conter dois tipo de valores
-  # # de acordo com a documentacao do PagSeguro: 
-  # # CP = Carrinho Proprio, ou seja o cliente será enviado para o site do PagSeguro apenas para o pagamento
-  # #      todo o controle de inclusao e remocao de itens do carrinho de compras é de responsabilidade da loja
-  # #
-  # # Este valor pode ser definido no environment.rb
-  # TIPO_CARRINHO = "CP"
-  # 
-  # # Moeda padrao do pagamento, por enquanto o PagSeguro só atende o Brasil/Real
-  # # Moeda padrao: BRL (Brazilian Real)
-  # MOEDA = "BRL"
-  # 
-  # # Pais do cliente, por enquanto o PagSeguro só atende o Brasil
-  # # Pais padrão: BRA (Brazil)
-  # PAIS = "BRA"
-  # 
-  # # URL do post para o site do PagSeguro
-  # WEBPAGTO = "https://pagseguro.uol.com.br/security/webpagamentos/webpagto.aspx?"
 
 
   # Calcula o preco do frete baseado nas informacoes:
-  # peso: peso total do pedido
+  # peso: peso total do sale
   # tipo_frete: tipo de frete escolhido EN(PAC) ou SD(Sedex)
   # cep: cep de destino da mercadoria
   # email_loja: email cadastrado no PagSeguro, o cep de origem está localizado no cadastro do vendedor
   #
   # Ex.:
-  # PsIntegracao.calcula_frete pedido ==> 12.95
+  # PsIntegracao.calcula_frete sale ==> 12.95
   #
   #TODO Test
-  def calcular_frete(pedido)
+  def shipment_price(sale)
         
     parametros = []
-    parametros << "&tipo_frete=#{pedido.tipo_frete}"    
-    parametros << "&cliente_cep=#{pedido.cep1}#{pedido.cep2}" 
+    parametros << "&tipo_frete=#{sale.shipment_type}"    
+    parametros << "&cliente_cep=#{sale.zip1}#{sale.zip2}" 
 
-    pedido.itens.values.each_with_index do |item, i| 
-      parametros << "&item_id_#{i+1}=#{item.codigo}"
-      parametros << "&item_descr_#{i+1}=#{item.descricao}"
-      parametros << "&item_quant_#{i+1}=#{item.quantidade}"
-      parametros << "&item_valor_#{i+1}=#{to_dinheiro(item.valor_total.to_s)}"
-      parametros << "&item_peso_#{i+1}=#{to_peso(item.peso_total.to_s)}"
+    sale.itens.values.each_with_index do |item, i| 
+      parametros << "&item_id_#{i+1}=#{item.code}"
+      parametros << "&item_descr_#{i+1}=#{item.description}"
+      parametros << "&item_quant_#{i+1}=#{item.quantity}"
+      parametros << "&item_valor_#{i+1}=#{to_money(item.price_total.to_s)}"
+      parametros << "&item_peso_#{i+1}=#{to_weight(item.weight_total.to_s)}"
     end
     
     http = Net::HTTP.new(@uri.host, 443)
@@ -93,8 +67,8 @@ class PsIntegracao
   # @form_html = PsIntegracao.criar_htmlform(ps_cliente, ps_items)
   #
   #TODO test
+  #TODO colocar em um helper (??)
   def self.checkout_htmlform id_transacao, ps_cliente, ps_items, *frete
-# TODO TEST
 
     raise "Cliente inválido!" if (ps_cliente.nil?)
     raise "Os Itens do carrinho de compras, devem ser um Array de PsItem." if (ps_items.class != Array)    
@@ -119,7 +93,7 @@ class PsIntegracao
     data += " <input type=\"hidden\" name=\"cliente_tel\" value=\"#{ps_cliente.cliente_tel}\" /> \n"
     data += " <input type=\"hidden\" name=\"cliente_email\" value=\"#{ps_cliente.cliente_email}\" /> \n"
 
-    #id do pedido....
+    #id do sale....
     
     #tipo de frete..
     if (!frete.empty?)
@@ -163,16 +137,18 @@ class PsIntegracao
   # integracao.to_peso "1" ==> 1000       #1 kilo
   # integracao.to_peso "1.0" ==> 1000     #1 kilo
   #
-  def to_peso valor
+  def to_weight valor    
     return nil if valor.nil?
     return nil if valor.class != String
+    return "000" if valor.to_f == 0
 
-    # frac = valor.to_d.frac.to_s + "00"
-    frac = BigDecimal.new(valor).frac.to_f.to_s + "00"    
-    frac = frac[2,3]
+    # obtem a parte fracionaria e transforma em string.
+    frac = valor.to_f - valor.to_i
+    frac = frac.to_s + "00"         
+    frac = frac[2..4]
     inteiro = ""
-    inteiro = valor.to_i.to_s if (valor.to_i > 0)
-    novo_valor = inteiro + frac.to_s
+    inteiro = valor.to_i.to_s if (valor.to_f.truncate > 0)
+    novo_valor = inteiro + frac.to_s    
   end
 
 
@@ -184,59 +160,52 @@ class PsIntegracao
   # integracao.to_dinheiro "1" ==> 100       #1 real
   # integracao.to_dinheiro "1.0" ==> 100     #1 real
   #
-  def to_dinheiro valor
-    return nil if valor.nil?
-    return nil if valor.class != String
+  def to_money valor
+     return nil if valor.nil?
+     return nil if valor.class != String
+     return "00" if valor.to_f == 0
 
-    # frac = valor.to_d.frac.to_s + "0"
-    frac = BigDecimal.new(valor).frac.to_f.to_s + "0"    
-    frac = frac[2,2]
-    inteiro = ""
-    inteiro = valor.to_i.to_s if (valor.to_i > 0)
-    novo_valor = inteiro + frac.to_s
-    
+     # obtem a parte fracionaria e transforma em string.
+     frac = valor.to_f - valor.to_i
+     frac = frac.to_s + "0"         
+     frac = frac[2..3]
+     # Se tiver parte inteira, concatena com a parte fracionaria
+     inteiro = ""
+     inteiro = valor.to_i.to_s if valor.to_f.truncate > 0
+     inteiro + frac
   end
 
 
-  # Envia um post para o PagSeguro solicitando a autenticidade do post enviado pelo PagSeguro
-  # Segundo a documentacao do PagSeguro, após o pagamento da compra, o sistema envia uma notificacao
-  # via post para o site do lojista.
-  # Este metodo é o responsavel por processar este post e conferir se os dados gravados na base de dados
-  # local está igual ao enviado pelo PagSeguro
-  # Caso tenha algo diferente retorna o Hash com a diferenca
-  #
-  # Ex.:
-  # PsIntegracao.compara_post_notificacao request, cliente, items ==> ['Nome' => 'valor_antigo > novo_valor']
-  def self.compara_post_notification request, ps_cliente, ps_items
-    #TODO
-    #TODO TEST
-  end
+  # # Envia um post para o PagSeguro solicitando a autenticidade do post enviado pelo PagSeguro
+  # # Segundo a documentacao do PagSeguro, após o pagamento da compra, o sistema envia uma notificacao
+  # # via post para o site do lojista.
+  # # Este metodo é o responsavel por processar este post e conferir se os dados gravados na base de dados
+  # # local está igual ao enviado pelo PagSeguro
+  # # Caso tenha algo diferente retorna o Hash com a diferenca
+  # #
+  # # Ex.:
+  # # PsIntegracao.compara_post_notificacao request, cliente, items ==> ['Nome' => 'valor_antigo > novo_valor']
+  # def self.compara_post_notification request, ps_cliente, ps_items
+  #   #TODO
+  #   #TODO TEST
+  # end
+  # 
+  # 
+  # # Envia um post para o PagSeguro solicitando a autenticidade do post enviado pelo PagSeguro
+  # # Segundo a documentacao do PagSeguro, após o pagamento da compra, o sistema envia uma notificacao
+  # # via post para o site do lojista.
+  # # Este metodo é o responsavel por enviar um novo post ao PS, solicitando a autenticidade do post recebido 
+  # # informando o processamento da trasnacao, geramente a confirmacao de pagamento.
+  # #
+  # # Ex.:
+  # # PsIntegracao.confirma_autenticidade cliente, items ==> ['FRAUDE', 'Alteracao do status da transacao fraudulenta!']
+  # # PsIntegracao.confirma_autenticidade cliente, items ==> ['OK', 'Alteracao do status da transacao verificada!']  
+  # #
+  # def self.confirma_autenticidade ps_cliente, ps_items
+  #   #TODO
+  #   #TODO TEST
+  # end
 
 
-  # Envia um post para o PagSeguro solicitando a autenticidade do post enviado pelo PagSeguro
-  # Segundo a documentacao do PagSeguro, após o pagamento da compra, o sistema envia uma notificacao
-  # via post para o site do lojista.
-  # Este metodo é o responsavel por enviar um novo post ao PS, solicitando a autenticidade do post recebido 
-  # informando o processamento da trasnacao, geramente a confirmacao de pagamento.
-  #
-  # Ex.:
-  # PsIntegracao.confirma_autenticidade cliente, items ==> ['FRAUDE', 'Alteracao do status da transacao fraudulenta!']
-  # PsIntegracao.confirma_autenticidade cliente, items ==> ['OK', 'Alteracao do status da transacao verificada!']  
-  #
-  def self.confirma_autenticidade ps_cliente, ps_items
-    #TODO
-    #TODO TEST
-  end
 
-
-
-end
-
-
-class PsCliente
-  attr_accessor :cliente_nome, :cliente_cep, :cliente_end, :cliente_num, :cliente_compl, :cliente_bairro, :cliente_cidade, :cliente_uf, :cliente_ddd, :cliente_tel, :cliente_email
-end
-
-class PsItem
-  attr_accessor :id, :descricao, :quantidade, :valor, :peso
 end
