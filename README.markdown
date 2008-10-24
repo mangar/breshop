@@ -1,28 +1,28 @@
 # brEshop
 
-**brEshop** é um *conjunto de bibliotecas* que pode ser utilizado para o desenvolvimento de uma loja virtual.
+**brEshop** is a *library set* which can be used for e-commerce development.
 
-## Em desenvolvimento
+## Working on
 
-Ainda estamos em processo de desenvolvimento. Você pode contribuir também!
+We are in development process. You can contribute too!
 
-Atualmente estamos desenvolvendo a integração com o serviço PagSeguro do UOL.
+Currently, we are developing a integration with the service PagSeguro, provided by UOL.
 
-## Testando
+## Testing
 
-As configurações com o PagSeguro podem ser feitas em `pagseguro/config/test.yml`
+The configurations with the PagSeguro can be added in `pagseguro/config/test.yml`
 
-Para verificar o funcionamento comece pelo arquivo `pagseguro/integration.rb` que é a classe principal da biblioteca PagSeguro.
+For verify the operation you must begin in file `pagseguro/integration.rb` it is the main class of PagSeguro library.
 
-Execute `rake test` para verificar se tudo está funcionando ok.
+Execute `rake test` for check if everything is working fine.
 
-## Aviso
+## Disclaimer
 
-*Nada impede que estas bibliotecas sejam utilizadas em aplicativos comerciais ou de outra natureza que não **comércio eletrônico**.*
+*Nothing prevent this libraries are used in commercial applications or by other aim that not **e-commerce**.*
 
 
-## Instalando
+## Installing
 
-Como plugin:
+As plugin:
 
     ruby script/plugin install git://github.com/mangar/breshop.git
