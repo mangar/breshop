@@ -36,11 +36,11 @@ class PagseguroTest < Test::Unit::TestCase
     sale << @item_1
     
     shipment = ps.shipment_price sale
-    assert_equal("7,20", shipment, "Cep: 14055490 / EN / 0.100 ==> 7.20 (1)")
+    assert_equal(7.2, shipment, "Cep: 14055490 / EN / 0.100 ==> 7.2 (1)")
     
     sale << @item_2
     shipment = ps.shipment_price sale
-    assert_equal("12,61", shipment, "Cep: 14055490 / EN / 1.100 ==> 12,61 (2)")
+    assert_equal(12.61, shipment, "Cep: 14055490 / EN / 1.100 ==> 12.61 (2)")
     
     
     #testes com SEDEX............
@@ -51,11 +51,11 @@ class PagseguroTest < Test::Unit::TestCase
     sale << @item_1
     
     shipment = ps.shipment_price sale
-    assert_equal("10,70", shipment, "Cep: 14055490 / SD / 0.100 ==> 10,70 (3)")
+    assert_equal(10.7, shipment, "Cep: 14055490 / SD / 0.100 ==> 10.7 (3)")
     
     sale << @item_2
     shipment = ps.shipment_price sale
-    assert_equal("13,80", shipment, "Cep: 14055490 / SD / 1.100 ==> 13,80 (4)")
+    assert_equal(13.8, shipment, "Cep: 14055490 / SD / 1.100 ==> 13.8 (4)")
 
   end
   

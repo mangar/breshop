@@ -32,6 +32,9 @@ class Integration
   #TODO Test
   def shipment_price(sale)
         
+        # puts "ENCODE: #{ERB::Util.url_encode(username)} / #{ERB::Util.url_encode(password)}"
+        
+        
     parametros = []
     parametros << "&tipo_frete=#{sale.shipment_type}"    
     parametros << "&cliente_cep=#{sale.zip1}#{sale.zip2}" 
@@ -54,7 +57,8 @@ class Integration
     # puts "\n\n\n #{@source} \n\n\n"
 
     
-    (@source/"#lblValorFrete").first.inner_html
+    price = (@source/"#lblValorFrete").first.inner_html
+    price = price.sub(',','.').to_f
   end
 
 
