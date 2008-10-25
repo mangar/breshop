@@ -3,7 +3,7 @@ require 'uri'
 require 'net/http'
 require 'net/https'
 require 'hpricot'
-require 'bigdecimal'
+require "erb"
 
 class Integration
     
@@ -32,16 +32,13 @@ class Integration
   #TODO Test
   def shipment_price(sale)
         
-        # puts "ENCODE: #{ERB::Util.url_encode(username)} / #{ERB::Util.url_encode(password)}"
-        
-        
     parametros = []
     parametros << "&tipo_frete=#{sale.shipment_type}"    
     parametros << "&cliente_cep=#{sale.zip1}#{sale.zip2}" 
 
     sale.itens.values.each_with_index do |item, i| 
       parametros << "&item_id_#{i+1}=#{item.code}"
-      parametros << "&item_descr_#{i+1}=#{item.description}"
+      parametros << "&item_descr_#{i+1}=#{ERB::Util.url_encode(item.description)}"
       parametros << "&item_quant_#{i+1}=#{item.quantity}"
       parametros << "&item_valor_#{i+1}=#{to_money(item.price_total.to_s)}"
       parametros << "&item_peso_#{i+1}=#{to_weight(item.weight_total.to_s)}"
@@ -55,7 +52,6 @@ class Integration
     
     @source = Hpricot(html)
     # puts "\n\n\n #{@source} \n\n\n"
-
     
     price = (@source/"#lblValorFrete").first.inner_html
     price = price.sub(',','.').to_f
