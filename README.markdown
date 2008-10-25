@@ -26,3 +26,13 @@ Execute `rake test` for check if everything is working fine.
 As plugin:
 
     ruby script/plugin install git://github.com/mangar/breshop.git
+
+## Help
+
+Do you wanna to help? Do you have any new idea? Contact us! Make a fork! 
+
+Enjoy!
+
+
+
+
