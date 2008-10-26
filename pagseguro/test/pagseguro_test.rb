@@ -59,7 +59,6 @@ class PagseguroTest < Test::Unit::TestCase
 
   end
   
-
   def test_to_weight
     pagseguro = Integration.new
     

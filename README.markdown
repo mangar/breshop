@@ -20,12 +20,39 @@ Execute `rake test` for check if everything is working fine.
 
 *Nothing prevent this libraries are used in commercial applications or by other aim that not **e-commerce**.*
 
-
 ## Installing
 
 As plugin:
 
     ruby script/plugin install git://github.com/mangar/breshop.git
+
+## Using
+
+### PagSeguro
+
+### Calculating Shipment
+
+	require 'breshop'
+	#.
+	#.
+  	def shipent_price
+
+		# sale is your Sale object with products in
+	    sale.zip1 = "04515"
+	    sale.zip2 = "030"
+	    sale.shipment_type = "SD" #SD or EN
+
+	    pagseguro = Integration.new
+	    price = pagseguro.shipment_price sale
+
+		puts "Shipment price: #{price}"
+
+  	end
+
+### Checkout
+
+*Soon..*
+
 
 ## Help
 

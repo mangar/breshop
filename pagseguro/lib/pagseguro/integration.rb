@@ -7,7 +7,9 @@ require "erb"
 
 class Integration
     
-  #TODO test
+  # Integration can be instantiated using a config file as parameter
+  # if no one is specified, will be used the default: /../config/pageguro.yml
+  #
   def initialize(pars = {})
     
     @config = (pars[:config].nil? ? YAML.load_file(File.dirname(__FILE__) + "/../config/pagseguro.yml") : pars[:config])
@@ -20,16 +22,15 @@ class Integration
   end
 
 
-  # Calcula o preco do frete baseado nas informacoes:
-  # peso: peso total do sale
-  # tipo_frete: tipo de frete escolhido EN(PAC) ou SD(Sedex)
-  # cep: cep de destino da mercadoria
-  # email_loja: email cadastrado no PagSeguro, o cep de origem está localizado no cadastro do vendedor
+  # Calculate the shipment price based on the informations:
+  #   weight: total weight of the sale
+  #   shipment type: it depends if it is by PAC(EN) or SEDEX (SD)
+  #   zip code: destination zip code
+  #   store email: this is to calculate the origin
   #
   # Ex.:
-  # PsIntegracao.calcula_frete sale ==> 12.95
+  # integration.shipment_price sale
   #
-  #TODO Test
   def shipment_price(sale)
         
     parametros = []
