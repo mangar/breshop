@@ -8,13 +8,13 @@ class PagseguroTest < Test::Unit::TestCase
   
   def setup
     @item_1 = Item.new({:code=>"1",
-                        :description=>"produto01",
+                        :description=>"Descricao do Produto 01",
                         :quantity=>1,
                         :price=>11.50,
                         :weight=>0.100})
 
     @item_2 = Item.new({:code=>"2",
-                        :description=>"produto02",
+                        :description=>"Descricao do Produto 02",
                         :quantity=>2,
                         :price=>22.30,
                         :weight=>0.500})
@@ -23,41 +23,6 @@ class PagseguroTest < Test::Unit::TestCase
     @config = YAML.load_file(File.dirname(__FILE__) + '/pagseguro_test.yml')
   end
   
-
-  def test_shipment_price
-  
-    ps = Integration.new @config
-    
-    #testes com PAC.............
-    sale = Sale.new
-    sale.zip1 = "14055"
-    sale.zip2 = "490"
-    sale.shipment_type = "EN"
-    sale << @item_1
-    
-    shipment = ps.shipment_price sale
-    assert_equal(7.2, shipment, "Cep: 14055490 / EN / 0.100 ==> 7.2 (1)")
-    
-    sale << @item_2
-    shipment = ps.shipment_price sale
-    assert_equal(12.61, shipment, "Cep: 14055490 / EN / 1.100 ==> 12.61 (2)")
-    
-    
-    #testes com SEDEX............
-    sale = Sale.new
-    sale.zip1 = "14055"
-    sale.zip2 = "490"
-    sale.shipment_type = "SD"
-    sale << @item_1
-    
-    shipment = ps.shipment_price sale
-    assert_equal(10.7, shipment, "Cep: 14055490 / SD / 0.100 ==> 10.7 (3)")
-    
-    sale << @item_2
-    shipment = ps.shipment_price sale
-    assert_equal(13.8, shipment, "Cep: 14055490 / SD / 1.100 ==> 13.8 (4)")
-
-  end
   
   def test_to_weight
     pagseguro = Integration.new
@@ -107,12 +72,16 @@ class PagseguroTest < Test::Unit::TestCase
     
     price = pagseguro.to_weight "1.510"
     assert_equal "1510", price, "2.11 - 1.510 => 1510"     
+
+    price = pagseguro.to_weight "0.1"
+    assert_equal "100", price, "2.12 - 0.1 => 100"     
+
      
   end
   
   def test_to_money
     pagseguro = Integration.new
-
+  
     #1.1 - nil
     price = pagseguro.to_money nil
     assert_nil price, "1.1 - nil, se o parametro for nil, o retorno tbem devera ser nil"
@@ -149,6 +118,81 @@ class PagseguroTest < Test::Unit::TestCase
     
     price = pagseguro.to_money "1.05"
     assert_equal "105", price, "2.8 - 1.05 => 105 real (100)"
+    
+    price = pagseguro.to_money "0.05"
+    assert_equal "05", price, "2.9 - 0.05 => 05 real"
+    
   end
+  
+  def test_checkout
+    pagseguro = Integration.new
+    
+    sale = Sale.new
+    
+    # sale nil
+    assert_raise RuntimeError do pagseguro.checkout nil; end
+    
+    # sale.buyer nil
+    assert_raise RuntimeError do pagseguro.checkout sale end
+    
+    # sale.buyer = "some name"
+    sale.buyer = "Some Name"
+    assert_raise RuntimeError do pagseguro.checkout sale end
+    buyer = Buyer.new
+    sale.buyer = Buyer.new
+    
+    # itens qt == 0.
+    assert_raise RuntimeError do pagseguro.checkout sale end
+    sale << @item_1
+    
+    
+    sale.buyer.name = "Marcio Garcia"
+    sale.code = "TC01"
+    sale.buyer.zip = "04515030"
+    sale.buyer.address = "Av. Jacutinga"
+    sale.buyer.number = "632"
+    sale.buyer.complement = "AP22"
+    sale.buyer.district = "Moema"
+    sale.buyer.city = "Sao Paulo"
+    sale.buyer.state = "SP"
+    sale.buyer.email = "email@uol.com.br"
+    sale.buyer.ext = "11"
+    sale.buyer.phone = "86717148"
+    sale.shipment_type = "EN"
+        
+    assert_equal(self.return_form_pac_one_product, pagseguro.checkout(sale), "Shipment type defined by the seller, calculated by weight (EN = PAC)")
+    
+    sale.shipment_type = "SD"
+    assert_equal(self.return_form_sedex_one_product, pagseguro.checkout(sale), "Shipment type defined by the seller, calculated by weight (SD = SEDEX)")
+
+    sale.shipment_type = nil
+    assert_equal(self.return_form_one_product, pagseguro.checkout(sale), "Buyer will select the shipment type and price on PagSeguro")
+  
+    assert_equal(self.return_form_defined_one_product, pagseguro.checkout(sale, 1000), "Shipment fee defined by seller = R$10,00")
+
+    sale.shipment_type = "SD"
+    assert_equal(self.return_form_defined_one_product, pagseguro.checkout(sale, 1000), "Shipment fee defined by seller = R$10,00")
+
+    sale.shipment_type = "EN"
+    assert_equal(self.return_form_defined_one_product, pagseguro.checkout(sale, 1000), "Shipment fee defined by seller = R$10,00")
+    
+  end
+  
+  def return_form_sedex_one_product
+    data = "<form action=\"https://pagseguro.uol.com.br/security/webpagamentos/webpagto.aspx\" method=\"post\" name=\"payment_form\"> \n <input type=\"hidden\" name=\"ref_transacao\" value=\"TC01\" /> \n <input type=\"hidden\" name=\"email_cobranca\" value=\"marcio.mangar@uol.com.br\" /> \n <input type=\"hidden\" name=\"tipo\" value=\"CP\" /> \n <input type=\"hidden\" name=\"moeda\" value=\"BRL\" /> \n <input type=\"hidden\" name=\"cliente_pais\" value=\"BRA\" /> \n <input type=\"hidden\" name=\"cliente_nome\" value=\"Marcio Garcia\" /> \n <input type=\"hidden\" name=\"cliente_cep\" value=\"04515030\" /> \n <input type=\"hidden\" name=\"cliente_end\" value=\"Av. Jacutinga\" /> \n <input type=\"hidden\" name=\"cliente_num\" value=\"632\" /> \n <input type=\"hidden\" name=\"cliente_compl\" value=\"AP22\" /> \n <input type=\"hidden\" name=\"cliente_bairro\" value=\"Moema\" /> \n <input type=\"hidden\" name=\"cliente_cidade\" value=\"Sao Paulo\" /> \n <input type=\"hidden\" name=\"cliente_uf\" value=\"SP\" /> \n <input type=\"hidden\" name=\"cliente_ddd\" value=\"11\" /> \n <input type=\"hidden\" name=\"cliente_tel\" value=\"86717148\" /> \n <input type=\"hidden\" name=\"cliente_email\" value=\"email@uol.com.br\" /> \n <input type=\"hidden\" name=\"tipo_frete\" value=\"SD\" /> \n <input type=\"hidden\" name=\"item_id_1\" value=\"1\" /> \n <input type=\"hidden\" name=\"item_descr_1\" value=\"Descricao do Produto 01\" /> \n <input type=\"hidden\" name=\"item_quant_1\" value=\"1\" /> \n <input type=\"hidden\" name=\"item_valor_1\" value=\"1150\" /> \n <input type=\"hidden\" name=\"item_peso_1\" value=\"100\" /> \n<input type=\"submit\" /> \n</form>" 
+  end
+  
+  def return_form_pac_one_product
+    data = "<form action=\"https://pagseguro.uol.com.br/security/webpagamentos/webpagto.aspx\" method=\"post\" name=\"payment_form\"> \n <input type=\"hidden\" name=\"ref_transacao\" value=\"TC01\" /> \n <input type=\"hidden\" name=\"email_cobranca\" value=\"marcio.mangar@uol.com.br\" /> \n <input type=\"hidden\" name=\"tipo\" value=\"CP\" /> \n <input type=\"hidden\" name=\"moeda\" value=\"BRL\" /> \n <input type=\"hidden\" name=\"cliente_pais\" value=\"BRA\" /> \n <input type=\"hidden\" name=\"cliente_nome\" value=\"Marcio Garcia\" /> \n <input type=\"hidden\" name=\"cliente_cep\" value=\"04515030\" /> \n <input type=\"hidden\" name=\"cliente_end\" value=\"Av. Jacutinga\" /> \n <input type=\"hidden\" name=\"cliente_num\" value=\"632\" /> \n <input type=\"hidden\" name=\"cliente_compl\" value=\"AP22\" /> \n <input type=\"hidden\" name=\"cliente_bairro\" value=\"Moema\" /> \n <input type=\"hidden\" name=\"cliente_cidade\" value=\"Sao Paulo\" /> \n <input type=\"hidden\" name=\"cliente_uf\" value=\"SP\" /> \n <input type=\"hidden\" name=\"cliente_ddd\" value=\"11\" /> \n <input type=\"hidden\" name=\"cliente_tel\" value=\"86717148\" /> \n <input type=\"hidden\" name=\"cliente_email\" value=\"email@uol.com.br\" /> \n <input type=\"hidden\" name=\"tipo_frete\" value=\"EN\" /> \n <input type=\"hidden\" name=\"item_id_1\" value=\"1\" /> \n <input type=\"hidden\" name=\"item_descr_1\" value=\"Descricao do Produto 01\" /> \n <input type=\"hidden\" name=\"item_quant_1\" value=\"1\" /> \n <input type=\"hidden\" name=\"item_valor_1\" value=\"1150\" /> \n <input type=\"hidden\" name=\"item_peso_1\" value=\"100\" /> \n<input type=\"submit\" /> \n</form>" 
+  end
+  
+  def return_form_one_product
+    data = "<form action=\"https://pagseguro.uol.com.br/security/webpagamentos/webpagto.aspx\" method=\"post\" name=\"payment_form\"> \n <input type=\"hidden\" name=\"ref_transacao\" value=\"TC01\" /> \n <input type=\"hidden\" name=\"email_cobranca\" value=\"marcio.mangar@uol.com.br\" /> \n <input type=\"hidden\" name=\"tipo\" value=\"CP\" /> \n <input type=\"hidden\" name=\"moeda\" value=\"BRL\" /> \n <input type=\"hidden\" name=\"cliente_pais\" value=\"BRA\" /> \n <input type=\"hidden\" name=\"cliente_nome\" value=\"Marcio Garcia\" /> \n <input type=\"hidden\" name=\"cliente_cep\" value=\"04515030\" /> \n <input type=\"hidden\" name=\"cliente_end\" value=\"Av. Jacutinga\" /> \n <input type=\"hidden\" name=\"cliente_num\" value=\"632\" /> \n <input type=\"hidden\" name=\"cliente_compl\" value=\"AP22\" /> \n <input type=\"hidden\" name=\"cliente_bairro\" value=\"Moema\" /> \n <input type=\"hidden\" name=\"cliente_cidade\" value=\"Sao Paulo\" /> \n <input type=\"hidden\" name=\"cliente_uf\" value=\"SP\" /> \n <input type=\"hidden\" name=\"cliente_ddd\" value=\"11\" /> \n <input type=\"hidden\" name=\"cliente_tel\" value=\"86717148\" /> \n <input type=\"hidden\" name=\"cliente_email\" value=\"email@uol.com.br\" /> \n <input type=\"hidden\" name=\"item_id_1\" value=\"1\" /> \n <input type=\"hidden\" name=\"item_descr_1\" value=\"Descricao do Produto 01\" /> \n <input type=\"hidden\" name=\"item_quant_1\" value=\"1\" /> \n <input type=\"hidden\" name=\"item_valor_1\" value=\"1150\" /> \n <input type=\"hidden\" name=\"item_peso_1\" value=\"100\" /> \n<input type=\"submit\" /> \n</form>" 
+  end  
+  
+  def return_form_defined_one_product
+    data = "<form action=\"https://pagseguro.uol.com.br/security/webpagamentos/webpagto.aspx\" method=\"post\" name=\"payment_form\"> \n <input type=\"hidden\" name=\"ref_transacao\" value=\"TC01\" /> \n <input type=\"hidden\" name=\"email_cobranca\" value=\"marcio.mangar@uol.com.br\" /> \n <input type=\"hidden\" name=\"tipo\" value=\"CP\" /> \n <input type=\"hidden\" name=\"moeda\" value=\"BRL\" /> \n <input type=\"hidden\" name=\"cliente_pais\" value=\"BRA\" /> \n <input type=\"hidden\" name=\"cliente_nome\" value=\"Marcio Garcia\" /> \n <input type=\"hidden\" name=\"cliente_cep\" value=\"04515030\" /> \n <input type=\"hidden\" name=\"cliente_end\" value=\"Av. Jacutinga\" /> \n <input type=\"hidden\" name=\"cliente_num\" value=\"632\" /> \n <input type=\"hidden\" name=\"cliente_compl\" value=\"AP22\" /> \n <input type=\"hidden\" name=\"cliente_bairro\" value=\"Moema\" /> \n <input type=\"hidden\" name=\"cliente_cidade\" value=\"Sao Paulo\" /> \n <input type=\"hidden\" name=\"cliente_uf\" value=\"SP\" /> \n <input type=\"hidden\" name=\"cliente_ddd\" value=\"11\" /> \n <input type=\"hidden\" name=\"cliente_tel\" value=\"86717148\" /> \n <input type=\"hidden\" name=\"cliente_email\" value=\"email@uol.com.br\" /> \n <input type=\"hidden\" name=\"item_frete_1\" value=\"1000\" /> \n <input type=\"hidden\" name=\"item_id_1\" value=\"1\" /> \n <input type=\"hidden\" name=\"item_descr_1\" value=\"Descricao do Produto 01\" /> \n <input type=\"hidden\" name=\"item_quant_1\" value=\"1\" /> \n <input type=\"hidden\" name=\"item_valor_1\" value=\"1150\" /> \n <input type=\"hidden\" name=\"item_peso_1\" value=\"100\" /> \n<input type=\"submit\" /> \n</form>" 
+  end  
+  
   
 end

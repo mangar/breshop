@@ -1,0 +1,18 @@
+url: http://www.correios.com.br/encomendas/precos/calculo.cfm?
+
+# url: http://www.correios.com.br/encomendas/precos/calculo.cfm?resposta=xml&servico=41106&cepOrigem=02255-090&cepDestino=01234-567&peso=15.56&MaoPropria=N&valorDeclarado=1350.66&avisoRecebimento=N
+
+# url: http://www.correios.com.br/encomendas/precos/calculo.cfm?resposta=xml
+# &servico=41106
+# &cepOrigem=02255-090
+# &cepDestino=01234-567
+# &peso=15.56
+# &MaoPropria=N
+# &valorDeclarado=1350.66
+# &avisoRecebimento=N
+
+aviso_recebimento: N
+mao_propria: N
+#41106 = PAC / 
+servico_padrao: 41106
+cep_origem: 04515-030

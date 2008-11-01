@@ -14,5 +14,5 @@ class Buyer
     @phone = params[:phone]
     @email = params[:email]
   end
-  
+
 end

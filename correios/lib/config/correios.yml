@@ -1,0 +1,37 @@
+#
+# Defult URL to get connection with Correios
+#
+url: http://www.correios.com.br/encomendas/precos/calculo.cfm?
+
+#
+# Correios has a service called "aviso de recebimento" it means that you (seller) will be notified by mail (not email)
+# when the destination receives the product.
+# It has a small plus in the final price
+#
+aviso_recebimento: N
+
+#
+#
+#
+#
+mao_propria: N
+
+#
+# Default service (servico_padrao). Correios has two types of delivery service: 
+# 1 - SEDEX : faster but not so sheap
+# 2 - PAC : not so fast but sheap
+# 
+# The codes are:
+# 
+# 41106 = PAC
+# ????? = SEDEX
+#
+servico_padrao: 41106
+
+#
+# From zip code (cep_origem) this is the default zip code of the seller.
+# It can be replaced by code
+#
+# Follow the brazilian format: 00000-000
+#
+cep_origem: 04515-030

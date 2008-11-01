@@ -21,114 +21,77 @@ class Integration
     @uri = URI.parse(@config['webpagto'])
   end
 
-
-  # Calculate the shipment price based on the informations:
-  #   weight: total weight of the sale
-  #   shipment type: it depends if it is by PAC(EN) or SEDEX (SD)
-  #   zip code: destination zip code
-  #   store email: this is to calculate the origin
-  #
-  # Ex.:
-  # integration.shipment_price sale
-  #
-  def shipment_price(sale)
-        
-    parametros = []
-    parametros << "&tipo_frete=#{sale.shipment_type}"    
-    parametros << "&cliente_cep=#{sale.zip1}#{sale.zip2}" 
-
-    sale.itens.values.each_with_index do |item, i| 
-      parametros << "&item_id_#{i+1}=#{item.code}"
-      parametros << "&item_descr_#{i+1}=#{ERB::Util.url_encode(item.description)}"
-      parametros << "&item_quant_#{i+1}=#{item.quantity}"
-      parametros << "&item_valor_#{i+1}=#{to_money(item.price_total.to_s)}"
-      parametros << "&item_peso_#{i+1}=#{to_weight(item.weight_total.to_s)}"
-    end
-    
-    http = Net::HTTP.new(@uri.host, 443)
-    http.use_ssl = true
-    
-    # puts "#{@uri.host}#{@uri.path}?#{@parametros_config}#{parametros}"
-    resp, html = http.get("#{@uri.path}?#{@parametros_config}#{parametros}", nil)
-    
-    @source = Hpricot(html)
-    # puts "\n\n\n #{@source} \n\n\n"
-    
-    price = (@source/"#lblValorFrete").first.inner_html
-    price = price.sub(',','.').to_f
-  end
-
-
-
-
-
   # Cria o formulario no formato HTML para o post que será enviado ao site do PagSeguro
   # 
   # Ex.:
-  # @form_html = PsIntegracao.criar_htmlform(ps_cliente, ps_items)
+  # @form_html = integration.checkout sale ==> no shipment fee defined, will be calculated by PagSeguro
+  #              if you define shipment_type (SD/EN) it will be used by PagSeguro, if not, the buyer will 
+  #              select one of then as shipment
+  # @form_html = integration.checkout sale, "10.00" ==> fixed shipment fee 
   #
   #TODO test
   #TODO colocar em um helper (??)
-  def self.checkout_htmlform id_transacao, ps_cliente, ps_items, *frete
+  def checkout sale, *frete
 
-    raise "Cliente inválido!" if (ps_cliente.nil?)
-    raise "Os Itens do carrinho de compras, devem ser um Array de PsItem." if (ps_items.class != Array)    
-    raise "É necessário que o carrinho tenha pelo menos um item." if (ps_items.nil? || ps_items.size == 0)
-  
-    # checagem do cep...
-    data =  "<form action=\"#{WEBPAGTO}\" method=\"post\" name=\"payment_form\"> \n"
-    data += " <input type=\"hidden\" name=\"ref_transacao\" value=\"#{id_transacao}\" /> \n"
-    data += " <input type=\"hidden\" name=\"email_cobranca\" value=\"#{EMAIL_COBRANCA}\" /> \n"
-    data += " <input type=\"hidden\" name=\"tipo\" value=\"#{TIPO_CARRINHO}\" /> \n"
-    data += " <input type=\"hidden\" name=\"moeda\" value=\"#{MOEDA}\" /> \n"
-    data += " <input type=\"hidden\" name=\"cliente_pais\" value=\"#{PAIS}\" /> \n"
-    data += " <input type=\"hidden\" name=\"cliente_nome\" value=\"#{ps_cliente.cliente_nome}\" /> \n"
-    data += " <input type=\"hidden\" name=\"cliente_cep\" value=\"#{ps_cliente.cliente_cep}\" /> \n"
-    data += " <input type=\"hidden\" name=\"cliente_end\" value=\"#{ps_cliente.cliente_end}\" /> \n"
-    data += " <input type=\"hidden\" name=\"cliente_num\" value=\"#{ps_cliente.cliente_num}\" /> \n"
-    data += " <input type=\"hidden\" name=\"cliente_compl\" value=\"#{ps_cliente.cliente_compl}\" /> \n"
-    data += " <input type=\"hidden\" name=\"cliente_bairro\" value=\"#{ps_cliente.cliente_bairro}\" /> \n"
-    data += " <input type=\"hidden\" name=\"cliente_cidade\" value=\"#{ps_cliente.cliente_cidade}\" /> \n"
-    data += " <input type=\"hidden\" name=\"cliente_uf\" value=\"#{ps_cliente.cliente_uf}\" /> \n"
-    data += " <input type=\"hidden\" name=\"cliente_ddd\" value=\"#{ps_cliente.cliente_ddd}\" /> \n"
-    data += " <input type=\"hidden\" name=\"cliente_tel\" value=\"#{ps_cliente.cliente_tel}\" /> \n"
-    data += " <input type=\"hidden\" name=\"cliente_email\" value=\"#{ps_cliente.cliente_email}\" /> \n"
-
-    #id do sale....
+    raise "Invalid Sale" if sale.nil?
+    raise "Invalid buyer! (nil)" if sale.buyer.nil?
+    raise "Invalid buyer! (not a Buyer)" unless sale.buyer.class.eql? Buyer
+    raise "Invalid Itens! (qt = 0)" if sale.itens.size == 0
     
-    #tipo de frete..
-    if (!frete.empty?)
-      
-      #frete por peso (https://pagseguro.uol.com.br/Security/WebPagamentos/ConfigWebPagto.aspx)
-      if ((frete.member? "EN") || (frete.member? "SD"))
-        data += " <input type=\"hidden\" name=\"tipo_frete\" value=\"#{frete.first}\" /> \n"
-        
-      #frete fixo (https://pagseguro.uol.com.br/Security/WebPagamentos/ConfigWebPagto.aspx)
-      else
-        data += " <input type=\"hidden\" name=\"item_frete_1\" value=\"#{frete.first}\" /> \n"      
-      end
+    
+    data =  "<form action=\"#{@config['webpagto']}\" method=\"post\" name=\"payment_form\"> \n"
+    data += " <input type=\"hidden\" name=\"ref_transacao\" value=\"#{sale.code}\" /> \n"
+    data += " <input type=\"hidden\" name=\"email_cobranca\" value=\"#{@config['email_cobranca']}\" /> \n"
+    data += " <input type=\"hidden\" name=\"tipo\" value=\"#{@config['tipo_carrinho']}\" /> \n"
+    data += " <input type=\"hidden\" name=\"moeda\" value=\"#{@config['moeda']}\" /> \n"
+    data += " <input type=\"hidden\" name=\"cliente_pais\" value=\"#{@config['pais']}\" /> \n"
+    data += " <input type=\"hidden\" name=\"cliente_nome\" value=\"#{sale.buyer.name}\" /> \n"
+    data += " <input type=\"hidden\" name=\"cliente_cep\" value=\"#{sale.buyer.zip}\" /> \n"
+    data += " <input type=\"hidden\" name=\"cliente_end\" value=\"#{sale.buyer.address}\" /> \n"
+    data += " <input type=\"hidden\" name=\"cliente_num\" value=\"#{sale.buyer.number}\" /> \n"
+    data += " <input type=\"hidden\" name=\"cliente_compl\" value=\"#{sale.buyer.complement}\" /> \n"
+    data += " <input type=\"hidden\" name=\"cliente_bairro\" value=\"#{sale.buyer.district}\" /> \n"
+    data += " <input type=\"hidden\" name=\"cliente_cidade\" value=\"#{sale.buyer.city}\" /> \n"
+    data += " <input type=\"hidden\" name=\"cliente_uf\" value=\"#{sale.buyer.state}\" /> \n"
+    data += " <input type=\"hidden\" name=\"cliente_ddd\" value=\"#{sale.buyer.ext}\" /> \n"
+    data += " <input type=\"hidden\" name=\"cliente_tel\" value=\"#{sale.buyer.phone}\" /> \n"
+    data += " <input type=\"hidden\" name=\"cliente_email\" value=\"#{sale.buyer.email}\" /> \n"
+    
+    # shipment type...
+    # if no shipment_type is not specified and also shipment price, 
+    # the buyer will be asked, to select one
+    #
+    # https://pagseguro.uol.com.br/Security/WebPagamentos/ConfigWebPagto.aspx
+    #
+    if (frete.empty?)
+      #... calculated price, based on the weight and shipment type, calculated by PagSeguro
+      # configure on the PagSeguro: https://pagseguro.uol.com.br/Security/WebPagamentos/ConfigWebPagto.aspx (Frete por peso)
+      data += " <input type=\"hidden\" name=\"tipo_frete\" value=\"#{sale.shipment_type}\" /> \n" unless sale.shipment_type.nil?
+    else
+      #... fixed price
+      # configure on the PagSeguro: https://pagseguro.uol.com.br/Security/WebPagamentos/ConfigWebPagto.aspx (Frete fixo com desconto)
+      data += " <input type=\"hidden\" name=\"item_frete_1\" value=\"#{frete.first}\" /> \n"      
     end
     
-    i = 1
-    ps_items.each do |item|
-      data += " <input type=\"hidden\" name=\"item_id_#{i}\" value=\"#{item.id}\" /> \n"
-      data += " <input type=\"hidden\" name=\"item_descr_#{i}\" value=\"#{item.descricao}\" /> \n"
-      data += " <input type=\"hidden\" name=\"item_quant_#{i}\" value=\"#{item.quantidade}\" /> \n"
-      data += " <input type=\"hidden\" name=\"item_valor_#{i}\" value=\"#{item.valor}\" /> \n"
-      data += " <input type=\"hidden\" name=\"item_peso_#{i}\" value=\"#{item.peso}\" /> \n"      
-
+    sale.itens.values.each_with_index do |item, i|
+      data += " <input type=\"hidden\" name=\"item_id_#{i+1}\" value=\"#{item.code}\" /> \n"
+      data += " <input type=\"hidden\" name=\"item_descr_#{i+1}\" value=\"#{item.description}\" /> \n"
+      data += " <input type=\"hidden\" name=\"item_quant_#{i+1}\" value=\"#{item.quantity}\" /> \n"
+      data += " <input type=\"hidden\" name=\"item_valor_#{i+1}\" value=\"#{self.to_money(item.price.to_s)}\" /> \n"
+      data += " <input type=\"hidden\" name=\"item_peso_#{i+1}\" value=\"#{self.to_weight(item.weight.to_s)}\" /> \n"      
+    
       #TODO colocar o valor do frete.....
-      i += 1
     end
     
-    data += "<input type=\"submit\" />"
-    # data += "<script language=\"JavaScript\"> document.payment_form.submit(); </script>"
+    data += "<input type=\"submit\" /> \n"
+    # data += "<script language=\"JavaScript\"> document.payment_form.submit(); </script> \n"
+
     data += "</form>"
     
   end
 
 
-
+  #TODO Traduzir para ingles............
   # Formata o campo de decimal para String no padrao solicitado do PagSeguro
   # Ex.:
   # integracao.to_peso "0.5" ==> 500      #500 gramas
@@ -153,6 +116,7 @@ class Integration
   end
 
 
+  # TODO traduzir para ingles................
   # Formata o campo de decimal para String no padrao solicitado do PagSeguro
   # Ex.:
   # integracao.to_dinheiro "0.5" ==> 50      #50 centavos
