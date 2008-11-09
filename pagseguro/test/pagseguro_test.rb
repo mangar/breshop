@@ -25,101 +25,97 @@ class PagseguroTest < Test::Unit::TestCase
   
   
   def test_to_weight
-    pagseguro = Integration.new
-    
     #1.1 - nil
-    price = pagseguro.to_weight nil
+    price = nil.to_ps_weight
     assert_nil price, "1.1 - nil, se o parametro for nil, o retorno tbem devera ser nil"
     
     #1.2 - price nao conversivel a decimal
-    price = pagseguro.to_weight "abc"
+    price = "abc".to_ps_weight
     assert_equal "000", price, "1.2 - o price deve ser conversivel a decimal, caso contrario retornara o weight zerado no formado PS (000)"
   
     #1.3 - price deve ser uma String
-    price = pagseguro.to_weight 14
+    price = 14.to_ps_weight
     assert_nil nil, "1.3 - price deve ser uma string"
   
     #2 - entradas validas
-    price = pagseguro.to_weight "0.5"
+    price = "0.5".to_ps_weight
     assert_equal "500", price, "2.1 - 0.5 => 500"
   
-    price = pagseguro.to_weight "0.50"
+    price = "0.50".to_ps_weight
     assert_equal "500", price, "2.2 - 0.50 => 500"
   
-    price = pagseguro.to_weight "0.500"
+    price = "0.500".to_ps_weight
     assert_equal "500", price, "2.3 - 0.500 => 500"
   
-    price = pagseguro.to_weight "0.05"
+    price = "0.05".to_ps_weight
     assert_equal "050", price, "2.4 - 0.05 => 050"
   
-    price = pagseguro.to_weight "0.005"
+    price = "0.005".to_ps_weight
     assert_equal "005", price, "2.5 - 0.05 => 005"
      
-    price = pagseguro.to_weight "1"
+    price = "1".to_ps_weight
     assert_equal "1000", price, "2.6 - 1 => 1000"
     
-    price = pagseguro.to_weight "1.0"
+    price = "1.0".to_ps_weight
     assert_equal "1000", price, "2.7 - 1.0 => 1000"     
      
-    price = pagseguro.to_weight "1.5"
+    price = "1.5".to_ps_weight
     assert_equal "1500", price, "2.8 - 1.5 => 1500"     
      
-    price = pagseguro.to_weight "1.500"
+    price = "1.500".to_ps_weight
     assert_equal "1500", price, "2.9 - 1.500 => 1500"
     
-    price = pagseguro.to_weight "1.501"
+    price = "1.501".to_ps_weight
     assert_equal "1501", price, "2.10 - 1.501 => 1501"
     
-    price = pagseguro.to_weight "1.510"
+    price = "1.510".to_ps_weight
     assert_equal "1510", price, "2.11 - 1.510 => 1510"     
 
-    price = pagseguro.to_weight "0.1"
+    price = "0.1".to_ps_weight
     assert_equal "100", price, "2.12 - 0.1 => 100"     
 
      
   end
   
   def test_to_money
-    pagseguro = Integration.new
-  
     #1.1 - nil
-    price = pagseguro.to_money nil
+    price = nil.to_ps_money
     assert_nil price, "1.1 - nil, se o parametro for nil, o retorno tbem devera ser nil"
     
     #1.2 - price nao conversivel a decimal
-    price = pagseguro.to_money "abc"
+    price = "abc".to_ps_money
     assert_equal "00", price, "1.2 - o price deve ser conversivel a decimal, caso contrario retornara o weight zerado no formado PS (000)"
   
     #1.3 - price deve ser uma String
-    price = pagseguro.to_money 14
+    price = 14.to_ps_money
     assert_nil nil, "1.3 - price deve ser uma string"
         
     #2 - entradas validas 
-    price = pagseguro.to_money "0.5"
+    price = "0.5".to_ps_money
     assert_equal "50", price, "2.1 - 0.5 => 50 centavos"
     
-    price = pagseguro.to_money "0.50"
+    price = "0.50".to_ps_money
     assert_equal "50", price, "2.2 - 0.50 => 50 centavos"
     
-    price = pagseguro.to_money "0.05"
+    price = "0.05".to_ps_money
     assert_equal "05", price, "2.3 - 0.05 => 05 centavos"
     
-    price = pagseguro.to_money "1"
+    price = "1".to_ps_money
     assert_equal "100", price, "2.4 - 1 => 1 real (100)"
     
-    price = pagseguro.to_money "1.0"
+    price = "1.0".to_ps_money
     assert_equal "100", price, "2.5 - 1.0 => 1 real (100)"
     
-    price = pagseguro.to_money "1.5"
+    price = "1.5".to_ps_money
     assert_equal "150", price, "2.6 - 1.5 => 1,5 real"
     
-    price = pagseguro.to_money "1.55"
+    price = "1.55".to_ps_money
     assert_equal "155", price, "2.7 - 1.55 => 1,55 real"
     
-    price = pagseguro.to_money "1.05"
+    price = "1.05".to_ps_money
     assert_equal "105", price, "2.8 - 1.05 => 105 real (100)"
     
-    price = pagseguro.to_money "0.05"
+    price = "0.05".to_ps_money
     assert_equal "05", price, "2.9 - 0.05 => 05 real"
     
   end

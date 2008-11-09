@@ -1,0 +1,32 @@
+%form{ :action=>config['webpagto'], :method=>"post", :name=>"payment_form" }
+  %input{ :type=>"hidden", :name=>"ref_transacao", :value=>sale.code}
+  %input{ :type=>"hidden", :name=>"email_cobranca", :value=>config['email_cobranca'] }
+  %input{ :type=>"hidden", :name=>"tipo", :value=>config['tipo_carrinho'] }
+  %input{ :type=>"hidden", :name=>"moeda", :value=>config['moeda'] }
+  %input{ :type=>"hidden", :name=>"cliente_pais", :value=>config['pais'] }
+  %input{ :type=>"hidden", :name=>"cliente_nome", :value=>sale.buyer.name }
+  %input{ :type=>"hidden", :name=>"cliente_cep", :value=>sale.buyer.zip }
+  %input{ :type=>"hidden", :name=>"cliente_end", :value=>sale.buyer.address }
+  %input{ :type=>"hidden", :name=>"cliente_num", :value=>sale.buyer.number }
+  %input{ :type=>"hidden", :name=>"cliente_compl", :value=>sale.buyer.complement }
+  %input{ :type=>"hidden", :name=>"cliente_bairro", :value=>sale.buyer.district }
+  %input{ :type=>"hidden", :name=>"cliente_cidade", :value=>sale.buyer.city }
+  %input{ :type=>"hidden", :name=>"cliente_uf", :value=>sale.buyer.state }
+  %input{ :type=>"hidden", :name=>"cliente_ddd", :value=>sale.buyer.ext }
+  %input{ :type=>"hidden", :name=>"cliente_tel", :value=>sale.buyer.phone }
+  %input{ :type=>"hidden", :name=>"cliente_email", :value=>sale.buyer.email }
+
+  - if frete.empty?
+    - unless sale.shipment_type.nil?
+      %input{ :type=>"hidden", :name=>"tipo_frete", :value=>sale.shipment_type}
+  - else
+    %input{ :type=>"hidden", :name=>"item_frete_1", :value=>frete.first }
+    
+  - sale.itens.values.each_with_index do |item, i|
+    %input{ :type=>"hidden", :name=>"item_id_#{i+1}", :value=>item.code }
+    %input{ :type=>"hidden", :name=>"item_descr_#{i+1}", :value=>item.description }
+    %input{ :type=>"hidden", :name=>"item_quant_#{i+1}", :value=>item.quantity }
+    %input{ :type=>"hidden", :name=>"item_valor_#{i+1}", :value=>item.price.to_ps_money }
+    %input{ :type=>"hidden", :name=>"item_peso_#{i+1}", :value=>item.weight.to_ps_weight }
+
+  %input{ :type=>"submit" }
