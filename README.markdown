@@ -60,6 +60,11 @@ Do you wanna to help? Do you have any new idea? Contact us! Make a fork!
 
 Enjoy!
 
+### Documentation
+
+http://code.google.com/p/breshop
+
+
 
 
 
