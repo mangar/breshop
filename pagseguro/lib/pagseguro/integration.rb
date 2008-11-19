@@ -12,7 +12,7 @@ class Integration
   #
   def initialize(pars = {})
     
-    @config = (pars[:config].nil? ? YAML.load_file(File.dirname(__FILE__) + "/../config/pagseguro.yml") : pars[:config])
+    @config = (pars[:config].nil? ? YAML.load_file(File.dirname(__FILE__) + "/../../../../../../config/breshop.yml")["pagseguro"] : pars[:config])
 
     @parametros_config = "tipo=#{@config['tipo_carrinho']}"
     @parametros_config << "&moeda=#{@config['moeda']}"

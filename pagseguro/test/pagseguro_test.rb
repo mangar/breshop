@@ -1,11 +1,19 @@
 require 'test/unit'
 require 'yaml'
+require 'rubygems'
+require 'mocha'
 
 require File.dirname(__FILE__) + '/../lib/pagseguro'
 require File.dirname(__FILE__) + '/../../general/lib/general'
 
 class PagseguroTest < Test::Unit::TestCase
   
+  PAGSEGURO_YML = {"pagseguro" => {'email_cobranca' => "marcio.mangar@uol.com.br", 
+                                   'tipo_carrinho' => "CP",
+                                   'moeda'         => "BRL",
+                                   'pais'          => "BRA",
+                                   'webpagto'      => "https://pagseguro.uol.com.br/security/webpagamentos/webpagto.aspx"}}
+    
   def setup
     @item_1 = Item.new({:code=>"1",
                         :description=>"Descricao do Produto 01",
@@ -23,6 +31,11 @@ class PagseguroTest < Test::Unit::TestCase
     @config = YAML.load_file(File.dirname(__FILE__) + '/pagseguro_test.yml')
   end
   
+  def test_integration_constructor_load_breshop_yml_in_config_rails_folder
+    YAML.expects(:load_file).with("./pagseguro/test/../lib/pagseguro/../../../../../../config/breshop.yml").returns(PAGSEGURO_YML)
+    integration = Integration.new
+    assert_equal PAGSEGURO_YML["pagseguro"], integration.instance_variable_get("@config")    
+  end
   
   def test_to_weight
     pagseguro = Integration.new
@@ -74,9 +87,7 @@ class PagseguroTest < Test::Unit::TestCase
     assert_equal "1510", price, "2.11 - 1.510 => 1510"     
 
     price = pagseguro.to_weight "0.1"
-    assert_equal "100", price, "2.12 - 0.1 => 100"     
-
-     
+    assert_equal "100", price, "2.12 - 0.1 => 100"
   end
   
   def test_to_money
@@ -125,6 +136,7 @@ class PagseguroTest < Test::Unit::TestCase
   end
   
   def test_checkout
+    YAML.expects(:load_file).with("./pagseguro/test/../lib/pagseguro/../../../../../../config/breshop.yml").returns(PAGSEGURO_YML)
     pagseguro = Integration.new
     
     sale = Sale.new
