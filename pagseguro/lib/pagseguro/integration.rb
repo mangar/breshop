@@ -11,8 +11,9 @@ class Integration
   # if no one is specified, will be used the default: /../config/pageguro.yml
   #
   def initialize(pars = {})
-    
-    @config = (pars[:config].nil? ? YAML.load_file(File.dirname(__FILE__) + "/../config/pagseguro.yml") : pars[:config])
+    @config = YAML.load_file(
+                (pars[:config].nil? ? File.dirname(__FILE__) + "/../../../../../../config/breshop.yml" : pars[:config])
+              )["pagseguro"]
 
     @parametros_config = "tipo=#{@config['tipo_carrinho']}"
     @parametros_config << "&moeda=#{@config['moeda']}"

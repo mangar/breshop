@@ -12,16 +12,17 @@ module Util
     #
     def to_ps_weight
       return nil if self.nil?
-      return nil if self.class != String
       return "000" if self.to_f == 0
+      
+      value = self.to_s
 
       # obtem a parte fracionaria e transforma em string.
-      frac = self.to_f - self.to_i
+      frac = value.to_f - value.to_i
       frac = frac.to_s + "00"         
       frac = frac[2..4]
       inteiro = ""
-      inteiro = self.to_i.to_s if (self.to_f.truncate > 0)
-      novo_valor = inteiro + frac.to_s    
+      inteiro = value.to_i.to_s if (value.to_f.truncate > 0)
+      inteiro + frac.to_s
     end
 
 
@@ -36,16 +37,17 @@ module Util
     #
     def to_ps_money
        return nil if self.nil?
-       return nil if self.class != String
        return "00" if self.to_f == 0
+       
+       value = self.to_s
 
        # obtem a parte fracionaria e transforma em string.
-       frac = self.to_f - self.to_i
+       frac = value.to_f - value.to_i
        frac = frac.to_s + "0"         
        frac = frac[2..3]
        # Se tiver parte inteira, concatena com a parte fracionaria
        inteiro = ""
-       inteiro = self.to_i.to_s if self.to_f.truncate > 0
+       inteiro = value.to_i.to_s if value.to_f.truncate > 0
        inteiro + frac
     end
   end
