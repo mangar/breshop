@@ -10,9 +10,18 @@ Currently, we are developing a integration with the service PagSeguro, provided 
 
 ## Testing
 
-The configurations with the PagSeguro can be added in `pagseguro/config/test.yml`
+To run tests you need to install mocha (http://mocha.rubyforge.org/):
 
-For verify the operation you must begin in file `pagseguro/integration.rb` it is the main class of PagSeguro library.
+Install the gem with the following command…
+
+	$ gem install mocha
+
+Or install the Rails plugin…
+
+	$ script/plugin install svn://rubyforge.org/var/svn/mocha/trunk
+
+Or download Mocha from here - rubyforge.org/projects/mocha
+
 
 Execute `rake test` for check if everything is working fine.
 
@@ -22,7 +31,11 @@ Execute `rake test` for check if everything is working fine.
 
 ## Installing
 
-As plugin:
+To use brEshop plugin you have to have HAML installed:
+
+	$ gem install --no-ri haml
+
+And to install brEshop as plugin type: 
 
     ruby script/plugin install git://github.com/mangar/breshop.git
 
