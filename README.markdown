@@ -28,30 +28,57 @@ As plugin:
 
 ## Using
 
-### PagSeguro
-
-### Calculating Shipment
+### PagSeguro - Checkout
 
 	require 'breshop'
 	#.
 	#.
-  	def shipent_price
+	#define os itens do carrinho de compras
+	@item_1 = Item.new({:code=>"1",
+	                        :description=>"produto01",
+	                        :quantity=>1,
+	                        :price=>11.50,
+	                        :weight=>0.100})
+ 
+	@item_2 = Item.new({:code=>"2",
+	                        :description=>"producto02",
+	                        :quantity=>2,
+	                        :price=>22.30,
+	                        :weight=>0.200})   
+ 
+	#cria o carrinho de compras e insere os itens..
+	sale = Sale.new
+	sale << @item_1
+	sale << @item_2
+ 
+	#registra os dados do comprador.... e as ultimas op�s de entrega...
+	sale.buyer = Buyer.new
+	sale.buyer.name = request.parameters['name'] + " " + request.parameters['last_name']
+	sale.code = "TC01"
+	sale.buyer.zip = request.parameters['zip1']+request.parameters['zip2']
+	sale.buyer.address = request.parameters['address']
+	sale.buyer.number = request.parameters['address_number']
+	sale.buyer.complement = request.parameters['address_complement']
+	sale.buyer.district = request.parameters['district']
+	sale.buyer.city = request.parameters['city']
+	sale.buyer.state = request.parameters['federal_unit']
+	sale.buyer.email = request.parameters['email']
+	sale.buyer.ext = request.parameters['phone1'][1..2]
+	sale.buyer.phone = request.parameters['phone1'][4..12]
+	sale.buyer.phone =     sale.buyer.phone.gsub('-', '')
+	sale.shipment_type = sale.shipment_type
+ 
+	pagseguro = Integration.new
+	@content = pagseguro.checkout(sale)
 
-		# sale is your Sale object with products in
-	    sale.zip1 = "04515"
-	    sale.zip2 = "030"
-	    sale.shipment_type = "SD" #SD or EN
 
-	    pagseguro = Integration.new
-	    price = pagseguro.shipment_price sale
+### Calculating Freight (based on Correios website - http://orreios.com.br)
 
-		puts "Shipment price: #{price}"
-
-  	end
-
-### Checkout
-
-*Soon..*
+	require 'breshop'
+	#.
+	#.
+	correios = Correios.new
+	preco = correios.freight sale.zip1+"-"+sale.zip2, sale.weight.to_s, sale.price.to_s
 
 
 ## Help

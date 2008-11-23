@@ -1,3 +1,4 @@
+<!-- start template -->
 %form{ :action=>config['webpagto'], :method=>"post", :name=>"payment_form" }
   %input{ :type=>"hidden", :name=>"ref_transacao", :value=>sale.code}
   %input{ :type=>"hidden", :name=>"email_cobranca", :value=>config['email_cobranca'] }
@@ -30,3 +31,4 @@
     %input{ :type=>"hidden", :name=>"item_peso_#{i+1}", :value=>item.weight.to_ps_weight }
 
   %input{ :type=>"submit" }
+<!-- end template -->

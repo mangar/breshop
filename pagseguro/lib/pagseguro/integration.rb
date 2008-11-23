@@ -12,8 +12,7 @@ class Integration
   #
   def initialize(pars = {})
     @config = YAML.load_file(
-                (pars[:config].nil? ? File.dirname(__FILE__) + "/../../../../../../config/breshop.yml" : pars[:config])
-              )["pagseguro"]
+                (pars[:config].nil? ? File.dirname(__FILE__) + "/../../../../../../config/breshop.yml" : pars[:config]))["pagseguro"]
 
     @parametros_config = "tipo=#{@config['tipo_carrinho']}"
     @parametros_config << "&moeda=#{@config['moeda']}"
@@ -22,7 +21,8 @@ class Integration
     @uri = URI.parse(@config['webpagto'])
   end
 
-  # Cria o formulario no formato HTML para o post que será enviado ao site do PagSeguro
+  # Create the form on HTML format to be posted into the PagSeguro website.
+  # It requires HAML
   # 
   # Ex.:
   # @form_html = integration.checkout sale ==> no shipment fee defined, will be calculated by PagSeguro
@@ -31,7 +31,6 @@ class Integration
   # @form_html = integration.checkout sale, "10.00" ==> fixed shipment fee 
   #
   #TODO test
-  #TODO colocar em um helper (??)
   def checkout sale, *frete
 
     raise "Invalid Sale" if sale.nil?
