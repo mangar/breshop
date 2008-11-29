@@ -10,19 +10,6 @@ Currently, we are developing a integration with the service PagSeguro, provided 
 
 ## Testing
 
-To run tests you need to install mocha (http://mocha.rubyforge.org/):
-
-Install the gem with the following command…
-
-	$ gem install mocha
-
-Or install the Rails plugin…
-
-	$ script/plugin install svn://rubyforge.org/var/svn/mocha/trunk
-
-Or download Mocha from here - rubyforge.org/projects/mocha
-
-
 Execute `rake test` for check if everything is working fine.
 
 ## Disclaimer
@@ -64,7 +51,7 @@ And to install brEshop as plugin type:
 	sale << @item_1
 	sale << @item_2
  
-	#registra os dados do comprador.... e as ultimas op�s de entrega...
+	#registra os dados do comprador.... e as ultimas opos de entrega...
 	sale.buyer = Buyer.new
 	sale.buyer.name = request.parameters['name'] + " " + request.parameters['last_name']
 	sale.code = "TC01"
@@ -85,7 +72,7 @@ And to install brEshop as plugin type:
 	@content = pagseguro.checkout(sale)
 
 
-### Calculating Freight (based on Correios website - http://orreios.com.br)
+### Calculating Freight (based on Correios website - http://correios.com.br)
 
 	require 'breshop'
 	#.
