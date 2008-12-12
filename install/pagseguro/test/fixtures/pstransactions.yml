@@ -1,0 +1,57 @@
+# == Schema Information
+# Schema version: 20081130150919
+#
+# Table name: pstransactions
+#
+#  id             :integer         not null, primary key
+#  transaction_id :string(255)
+#  seller_email   :string(255)
+#  ref            :string(255)
+#  freight_type   :string(255)
+#  freight_value  :string(255)
+#  extras         :string(255)
+#  annotation     :string(255)
+#  payment_type   :string(255)
+#  status         :string(255)
+#  cli_name       :string(255)
+#  cli_address    :string(255)
+#  cli_email      :string(255)
+#  cli_number     :string(255)
+#  cli_complement :string(255)
+#  cli_district   :string(255)
+#  cli_city       :string(255)
+#  cli_state      :string(255)
+#  cli_zip        :string(255)
+#  cli_phone      :string(255)
+#  count_itens    :string(255)
+#  checked        :string(255)
+#  created_at     :datetime
+#  updated_at     :datetime
+#
+
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+    transaction_id: "1"
+    seller_email: "1"
+    ref: "1"
+    freight_type: "1"
+    freight_value: "1"
+    extras: "1"
+    annotation: "1"
+    payment_type: "1"
+    status: "1"
+    cli_name: "1"
+    cli_address: "1"
+    cli_email: "1"
+    cli_number: "1"
+    cli_complement: "1"
+    cli_district: "1"   
+    cli_city: "1"       
+    cli_state: "1"      
+    cli_zip: "1"        
+    cli_phone: "1"      
+    count_itens: "1"    
+    checked: "1"        
+
+

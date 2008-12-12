@@ -80,6 +80,21 @@ And to install brEshop as plugin type:
 	correios = Correios.new
 	preco = correios.freight sale.zip1+"-"+sale.zip2, sale.weight.to_s, sale.price.to_s
 
+### Automatic Return (PS Service)
+
+If you want to use the PagSeguro function: "Automatic Return" follow these steps:
+
+1. Define a development and test database
+2. Run on command line: rake db:migrate
+
+These tasks will create two tables responsible to store posts coming from PagSeguro: pstransactions and psproducts.
+
+With your application running (./script/server), check the page: *http://localhost:300/autoret/show* it will shows you all records sent from PS.
+You can even simulate this communication pointing out your browser to:
+
+	http://localhost:3000/autoret?VendedorEmail=emaildovendedor&TransacaoID=123&Referencia=referencia&TipoFrete=FR&ValorFrete=10,00&Anotacao=anotacaooo&DataTransacao=dd/mm/yyyy hh:mm:ss&TipoPagamento=Pagamento via cartão de crédito&StatusTransacao=Em Análise&CliNome=NomeDoCabra&CliEmail=email@uol.com.br&CliEndereco=Endereco do cliente&CliNumero=1741&CliComplemento=AP22&CliBairro=Moema&CliCidade=Sao Paulo&CliEstado=SP&CliCEP=14055490&CliTelefone=00 00000000&NumItens=1&ProdID_1=1&ProdDescricao_1=Nome do Produto 01&ProdValor_1=100,00&ProdQuantidade_1=2&ProdFrete_1=10&ProdExtras_1=0
+
+More info about Automatic Return service can be found in PagSeguro website, in functional test suite, and even talking with brEshop developers.
 
 ## Help
 

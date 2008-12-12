@@ -1,0 +1,86 @@
+<html>
+<head>
+	<title>Show Records</title>	
+</head>
+<body>
+<h1>Show records....</h1>
+<table>
+	<tr>
+		<td><%= button_to ("Delete all records", :action => :clean) %><td>
+  		<td><%= button_to ("Update", :action => :show ) %>	</td>
+	</tr>
+</table>
+&nbsp;<br>
+<table border="1" cellpadding="1" cellspacing="0">
+	<tr bordercolor="#E8E8E8" bgcolor="#99CCFF">
+		<th>Record <br> Date</th>
+		<th>Checked</th>		
+		<th>TransactionID</th>
+		<th>SellerEmail</th>
+		<th>Ref</th>
+		<th>Freight <br> Type</th>
+		<th>Freight <br> Value</th>
+		<th>Extras</th>
+		<th>Annotation</th>
+		<th>Payment <br> Type</th>
+		<th>Status</th>
+		<th>Cli.Name</th> <th >Cli.Email</th> <th>Cli.Address</th> <th>Cli.No.</th> <th >Cli.Complement</th>
+		<th>Cli.District</th> <th >Cli.City</th> <th>Cli.State</th> <th>Cli.Zip</th> <th >Cli.Phone</th> <th >Cli.CountItens</th>
+	</tr>
+<% @txs.each do |tx| %>
+	<tr bgcolor="#FFFFCC">
+		<td><%= tx.created_at%></td>
+		<td><%= tx.checked%></td>		
+		<td><%= tx.transaction_id%></td>
+		<td><%= tx.seller_email%></td>
+		<td><%= tx.ref%></td> 
+		<td><%= tx.freight_type%></td> 
+		<td><%= tx.freight_value%></td> 
+		<td><%= tx.extras%></td> 
+		<td><%= tx.annotation%></td>
+		<td><%= tx.payment_type%></td>
+		<td><%= tx.status%></td>
+		<td><%= tx.cli_name%></td> <td><%= tx.cli_email%></td> <td><%= tx.cli_address%></td> <td><%= tx.cli_number%></td>
+		<td><%= tx.cli_complement%></td> <td><%= tx.cli_district%></td> <td><%= tx.cli_city%></td> <td><%= tx.cli_state%></td>
+		<td><%= tx.cli_zip%></td> <td><%= tx.cli_phone%></td> <td><%= tx.count_itens%></td> 
+	</tr>
+	<tr>
+		<td><b>Products:</b></td>
+		<td colspan="21">
+			<table width="100%">
+				<tr bordercolor="#E8E8E8" bgcolor="#99CCFF">
+					<th>id</th>
+					<th>transaction_id</th>
+					<th>product_id</th>
+					<th>description</th>
+					<th>price</th>
+					<th>quantity</th>
+					<th>freight_value</th>
+					<th>extra</th>
+					<th>created_at</th>
+					<th>updated_at</th>
+				</tr>
+				<% tx.psproducts.each do |prod|%>				
+				<tr bgcolor="#FFFFCC">
+					<td><%= prod.id%></td>
+					<td><%= prod.pstransaction_id%></td>
+					<td><%= prod.product_id%></td>
+					<td><%= prod.description%></td>
+					<td><%= prod.price%></td>
+					<td><%= prod.quantity%></td>
+					<td><%= prod.freight_value%></td>
+					<td><%= prod.extra%></td>
+					<td><%= prod.created_at%></td>
+					<td><%= prod.updated_at%></td>
+				</tr>
+				<% end %>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="22">&nbsp;</td>
+	</tr>
+<% end %>
+</table>
+</body>
+</html>
