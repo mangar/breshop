@@ -22,7 +22,7 @@ To use brEshop plugin you have to have HAML installed:
 
 	$ gem install --no-ri haml
 
-And to install brEshop as plugin type: 
+And to install brEshop as plugin type:
 
     ruby script/plugin install git://github.com/mangar/breshop.git
 
@@ -39,18 +39,18 @@ And to install brEshop as plugin type:
 	                        :quantity=>1,
 	                        :price=>11.50,
 	                        :weight=>0.100})
- 
+
 	@item_2 = Item.new({:code=>"2",
 	                        :description=>"producto02",
 	                        :quantity=>2,
 	                        :price=>22.30,
-	                        :weight=>0.200})   
- 
+	                        :weight=>0.200})
+
 	#cria o carrinho de compras e insere os itens..
 	sale = Sale.new
 	sale << @item_1
 	sale << @item_2
- 
+
 	#registra os dados do comprador.... e as ultimas opos de entrega...
 	sale.buyer = Buyer.new
 	sale.buyer.name = request.parameters['name'] + " " + request.parameters['last_name']
@@ -67,7 +67,7 @@ And to install brEshop as plugin type:
 	sale.buyer.phone = request.parameters['phone1'][4..12]
 	sale.buyer.phone =     sale.buyer.phone.gsub('-', '')
 	sale.shipment_type = sale.shipment_type
- 
+
 	pagseguro = Integration.new
 	@content = pagseguro.checkout(sale)
 
@@ -98,7 +98,7 @@ More info about Automatic Return service can be found in PagSeguro website, in f
 
 ## Help
 
-Do you wanna to help? Do you have any new idea? Contact us! Make a fork! 
+Do you wanna to help? Do you have any new idea? Contact us! Make a fork!
 
 Enjoy!
 

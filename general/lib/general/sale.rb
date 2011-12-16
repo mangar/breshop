@@ -20,19 +20,19 @@ class Sale
   #
   # Ex.:
   # sale << item
-  def <<(item)    
+  def <<(item)
     return if (item.nil?)
     raise InvalidItem unless item.class.eql? Item
 
     #item is in sale....
     if (@itens.has_key?(item.code))
-      
+
       #quantity eq zero, remove...
       @itens.delete item.code if (item.quantity == 0)
 
       #change the quantity
       @itens[item.code].quantity = item.quantity if (item.quantity > 0)
-      
+
     else
       @itens[item.code] = item
     end
@@ -47,7 +47,7 @@ class Sale
     price += (@shipment.nil? ? 0 : @shipment)
     price
   end
-  
+
   # Returns the total weight of the all product in the sale
   def weight
     weight = 0

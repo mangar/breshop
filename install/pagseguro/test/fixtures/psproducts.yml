@@ -19,9 +19,9 @@
 
 one:
     pstransaction_id: "1"
-    product_id: "1"      
-    description: "1"     
-    price: "1"           
-    quantity: "1"        
-    freight_value: "1"   
+    product_id: "1"
+    description: "1"
+    price: "1"
+    quantity: "1"
+    freight_value: "1"
     extra: "1"

@@ -17,12 +17,12 @@ aviso_recebimento: N
 mao_propria: N
 
 #
-# Default service (servico_padrao). Correios has two types of delivery service: 
+# Default service (servico_padrao). Correios has two types of delivery service:
 # 1 - SEDEX : faster but not so sheap
 # 2 - PAC : not so fast but sheap
-# 
+#
 # The codes are:
-# 
+#
 # 41106 = PAC
 # ????? = SEDEX
 #
