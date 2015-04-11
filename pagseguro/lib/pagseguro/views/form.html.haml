@@ -22,7 +22,7 @@
       %input{ :type=>"hidden", :name=>"tipo_frete", :value=>sale.shipment_type}
   - else
     %input{ :type=>"hidden", :name=>"item_frete_1", :value=>frete.first }
-    
+
   - sale.itens.values.each_with_index do |item, i|
     %input{ :type=>"hidden", :name=>"item_id_#{i+1}", :value=>item.code }
     %input{ :type=>"hidden", :name=>"item_descr_#{i+1}", :value=>item.description }

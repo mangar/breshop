@@ -1,6 +1,6 @@
 <html>
 <head>
-	<title>Show Records</title>	
+	<title>Show Records</title>
 </head>
 <body>
 <h1>Show records....</h1>
@@ -14,7 +14,7 @@
 <table border="1" cellpadding="1" cellspacing="0">
 	<tr bordercolor="#E8E8E8" bgcolor="#99CCFF">
 		<th>Record <br> Date</th>
-		<th>Checked</th>		
+		<th>Checked</th>
 		<th>TransactionID</th>
 		<th>SellerEmail</th>
 		<th>Ref</th>
@@ -30,19 +30,19 @@
 <% @txs.each do |tx| %>
 	<tr bgcolor="#FFFFCC">
 		<td><%= tx.created_at%></td>
-		<td><%= tx.checked%></td>		
+		<td><%= tx.checked%></td>
 		<td><%= tx.transaction_id%></td>
 		<td><%= tx.seller_email%></td>
-		<td><%= tx.ref%></td> 
-		<td><%= tx.freight_type%></td> 
-		<td><%= tx.freight_value%></td> 
-		<td><%= tx.extras%></td> 
+		<td><%= tx.ref%></td>
+		<td><%= tx.freight_type%></td>
+		<td><%= tx.freight_value%></td>
+		<td><%= tx.extras%></td>
 		<td><%= tx.annotation%></td>
 		<td><%= tx.payment_type%></td>
 		<td><%= tx.status%></td>
 		<td><%= tx.cli_name%></td> <td><%= tx.cli_email%></td> <td><%= tx.cli_address%></td> <td><%= tx.cli_number%></td>
 		<td><%= tx.cli_complement%></td> <td><%= tx.cli_district%></td> <td><%= tx.cli_city%></td> <td><%= tx.cli_state%></td>
-		<td><%= tx.cli_zip%></td> <td><%= tx.cli_phone%></td> <td><%= tx.count_itens%></td> 
+		<td><%= tx.cli_zip%></td> <td><%= tx.cli_phone%></td> <td><%= tx.count_itens%></td>
 	</tr>
 	<tr>
 		<td><b>Products:</b></td>
@@ -60,7 +60,7 @@
 					<th>created_at</th>
 					<th>updated_at</th>
 				</tr>
-				<% tx.psproducts.each do |prod|%>				
+				<% tx.psproducts.each do |prod|%>
 				<tr bgcolor="#FFFFCC">
 					<td><%= prod.id%></td>
 					<td><%= prod.pstransaction_id%></td>

@@ -13,6 +13,6 @@ url: http://www.correios.com.br/encomendas/precos/calculo.cfm?
 
 aviso_recebimento: N
 mao_propria: N
-#41106 = PAC / 
+#41106 = PAC /
 servico_padrao: 41106
 cep_origem: 04515-030

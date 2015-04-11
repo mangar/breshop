@@ -1,6 +1,6 @@
 module Util
   Object.class_eval do
-    
+
     # Format decimal field (weight format) to String (based on PagSeguro format)
     # Ex.:
     # integration.to_ps_weight "0.5" ==> 500      #500 gramas
@@ -13,12 +13,12 @@ module Util
     def to_ps_weight
       return nil if self.nil?
       return "000" if self.to_f == 0
-      
+
       value = self.to_s
 
       # obtem a parte fracionaria e transforma em string.
       frac = value.to_f - value.to_i
-      frac = frac.to_s + "00"         
+      frac = frac.to_s + "00"
       frac = frac[2..4]
       inteiro = ""
       inteiro = value.to_i.to_s if (value.to_f.truncate > 0)
@@ -37,12 +37,12 @@ module Util
     def to_ps_money
        return nil if self.nil?
        return "00" if self.to_f == 0
-       
+
        value = self.to_s
 
        # obtem a parte fracionaria e transforma em string.
        frac = value.to_f - value.to_i
-       frac = frac.to_s + "0"         
+       frac = frac.to_s + "0"
        frac = frac[2..3]
        # Se tiver parte inteira, concatena com a parte fracionaria
        inteiro = ""

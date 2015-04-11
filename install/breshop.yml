@@ -1,6 +1,6 @@
 # Este é o arquivo de configuração do plugin brEshop
 
-pagseguro: 
+pagseguro:
   email_cobranca: email@servidor.com
   tipo_carrinho: CP
   moeda: BRL

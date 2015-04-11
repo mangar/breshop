@@ -1,21 +1,21 @@
 class AutoretController < ApplicationController
-  
+
   # ok 1 - token no arquivo de configuracao
   # 2 - install para copiar os arquivos apra dentro da aplicacao
   # ok 3 - testes
   # ok 4 - tela para mostrar os registros e excluir
   # ok 5 - post de confirmacao da mensagem
   # 6 - mostrar mensagem de texto apos a instalacao para executar o rake db:migrate
-  
-  def index   
+
+  def index
     @config = YAML.load_file(File.dirname(__FILE__) + "/../../config/breshop.yml")["pagseguro"]
 
     @params = Hash.new
     @params[:token] = @config['token']
     @params.merge!(request.parameters)
-    
+
     Pstransaction.transaction do
-      
+
       tx = Pstransaction.new
       tx.transaction_id = request.parameters["TransacaoID"]
       tx.seller_email = request.parameters["VendedorEmail"]
@@ -36,7 +36,7 @@ class AutoretController < ApplicationController
       tx.cli_zip = request.parameters["CliCEP"]
       tx.cli_phone = request.parameters["CliTelefone"]
       tx.count_itens = request.parameters["NumItens"]
-    
+
       1.upto(request.parameters["NumItens"].to_i)  do |c|
         product = Psproduct.new
         product.pstransaction = tx
@@ -48,21 +48,21 @@ class AutoretController < ApplicationController
         product.extra = request.parameters["ProdExtras_#{c}"]
         product.save
       end
-        
+
       tx.save
     end
-    
-  end  
+
+  end
 
   def show
     @txs = Pstransaction.find_by_id(params[:id]) unless params[:id].blank?
     @txs = Pstransaction.find(:all) if params[:id].blank?
   end
-  
+
   def clean
     Pstransaction.delete_all
-    Psproduct.delete_all    
+    Psproduct.delete_all
     redirect_to :action => 'show'
   end
-  
+
 end
